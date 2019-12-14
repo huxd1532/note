@@ -1,0 +1,8 @@
+1、mo转po
+msgunfmt xxx.po -o xxx.mo
+生产mo（sudo包为例）：
+make compile-po 
+
+2、安装补丁和卸载补丁
+安装补丁包：patch  -p(n)  < [补丁包路径] patch_name
+卸载补丁包：patch  -p(n)  -R  < [补丁包路径] patch_name
