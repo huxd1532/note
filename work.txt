@@ -1,0 +1,8 @@
+2019
+第四十五周
+1、【killall】名称不完全匹配的任务也被结束掉了
+pms：
+https://pms.deepin.cn/task-view-12679.html
+commit：
+https://gitlab.deepin.io/debian-patch/debian-security/psmisc
+
