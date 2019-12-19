@@ -1,4 +1,17 @@
 2019
+第四十五周 以前：
+1、修改lshw源码，输出64位支持时不要带x86字样
+pms: https://pms.deepin.cn/task-view-10392.html
+
+2、打印机历史任务设置会导致窗口死掉
+pms: https://pms.deepin.cn/task-view-10612.html
+
+3、 打印机任务队列不能拖动
+pms: https://pms.deepin.cn/task-view-10911.html
+
+4、更新dts 分区工具看不到 m.2 信息
+https://pms.deepin.cn/task-view-10182.html
+
 第四十五周
 1、【killall】名称不完全匹配的任务也被结束掉了
 pms：

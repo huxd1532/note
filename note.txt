@@ -6,3 +6,40 @@ make compile-po
 2、安装补丁和卸载补丁
 安装补丁包：patch  -p(n)  < [补丁包路径] patch_name
 卸载补丁包：patch  -p(n)  -R  < [补丁包路径] patch_name
+
+3、qdbus调试
+qdbus --literal com.deepin.SessionManager /com/deepin/SessionManager com.deepin.SessionManager.Shutdown
+如果在远程终端上使用需要导入以下两个环境变量：
+export DISPLAY=:0
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus (和被远程连接的机器一致)
+
+4、sh -c
+https://blog.csdn.net/bobchill/article/details/84647575
+
+5、修改system 启动服务参数
+vim /lib/systemd/system/polkit.service/xxx
+sudo systemctl daemon-reload
+6、重定向进程打印
+vim /lib/systemd/system/polkit.service 
+/bin/sh -c '/usr/lib/policykit-1/polkitd > /tmp/polkit.log 2>&1'
+
+7、利用backtrace和backtrace_symbols打印函数调用关系
+https://www.cnblogs.com/klcf0220/p/5646821.html
+#include <execinfo.h>
+#define SYSBOLE_LEN 32
+void print_stacktrace()
+{
+    int size = SYSBOLE_LEN;
+    void * array[SYSBOLE_LEN];
+    int stack_num = backtrace(array, size);
+    char ** stacktrace = backtrace_symbols(array, stack_num);
+    printf("------printf stack start------\n");
+    for (int i = 0; i < stack_num; ++i)
+    {
+        printf("%s\n", stacktrace[i]);
+    }
+    printf("------printf stack end------\n");
+    free(stacktrace);
+}
+
+5、addr2line
