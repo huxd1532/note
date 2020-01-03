@@ -43,3 +43,91 @@ void print_stacktrace()
 }
 
 5、addr2line
+
+
+6、dbus调试
+dbus-monitor "type=method_call" > /tmp/session.log 2>&1
+sudo dbus-monitor --system "type=method_call" > /tmp/system.log 2>&1
+
+
+7、tty打印
+#include<stdio.h>
+#include <termios.h>
+#include <stdarg.h>
+FILE *open_tty(void){
+    char *tty_name;
+    FILE *tty_file;
+    tty_name = ctermid(NULL);
+    tty_file = fopen(tty_name, "r+");
+    return tty_file;
+}
+
+void close_tty(FILE *tty_file){
+    if(NULL != tty_file)
+        fclose(tty_file);
+}
+
+void tty_printf(char * format, ...)
+{
+    va_list args;
+    FILE *tty_file;
+    tty_file=open_tty();
+    if (NULL == tty_file)
+        return;
+    va_start(args,format);
+    vfprintf(tty_file, format, args);
+    va_end(args);
+    fflush(tty_file);
+    close_tty(tty_file);
+}
+
+void main(void)
+{
+    tty_printf("SADSFSF:%d, %s\n", 123, "abc");
+}
+
+或者：
+#include<stdio.h>
+#include <stdarg.h>
+FILE *open_tty(void){
+    const char *tty_name = "/tmp/polkit1.log";
+    FILE *tty_file = fopen(tty_name, "at+");
+    return tty_file;
+}
+
+void close_tty(FILE *tty_file){
+    if(NULL != tty_file)
+        fclose(tty_file);
+}
+
+void tty_printf(char * format, ...)
+{
+    va_list args;
+    FILE *tty_file;
+    tty_file=open_tty();
+    if (NULL == tty_file)
+        return;
+    va_start(args,format);
+    vfprintf(tty_file, format, args);
+    va_end(args);
+    fflush(tty_file);
+    close_tty(tty_file);
+}
+
+
+8、syslog
+#include<stdio.h>
+#include<stdlib.h>
+#include <syslog.h>
+
+int main()
+{
+    openlog("info",LOG_PID,LOG_LOCAL5);
+    syslog(LOG_INFO, "hello %s","info");
+    syslog(LOG_NOTICE, "hello %s","notice");
+    syslog(LOG_DEBUG, "hello %s","debug");
+    closelog();
+    return 0;
+}
+
+openlog ("polkit-agent-helper-1", LOG_CONS | LOG_PID, LOG_AUTHPRIV);

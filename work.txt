@@ -19,3 +19,69 @@ https://pms.deepin.cn/task-view-12679.html
 commit：
 https://gitlab.deepin.io/debian-patch/debian-security/psmisc
 
+
+第四六周
+
+#include <stdarg.h>
+
+
+static FILE *open_tty(void){
+    const char *tty_name = "/tmp/polkit1.log";
+    FILE *tty_file = fopen(tty_name, "at+");
+    return tty_file;
+}
+static void close_tty(FILE *tty_file){
+    if(NULL != tty_file)
+        fclose(tty_file);
+}
+
+
+static void tty_printf(char * format, ...)
+{
+    va_list args;
+    FILE *tty_file;
+    tty_file=open_tty();
+    if (NULL == tty_file)
+        return;
+    va_start(args,format);
+    vfprintf(tty_file, format, args);
+    va_end(args);
+
+    fflush(tty_file);
+    close_tty(tty_file);
+}
+
+
+static void polkit_details_dump(PolkitDetails *details)
+{
+    gchar **keys;
+    const gchar *key, *value;
+    gchar *s1, *s2;
+    keys = polkit_details_get_keys(details);
+    for(int n=0; keys != NULL && keys[n] != NULL; n++){
+        key = keys[n];
+        value = polkit_details_lookup(details, key);
+        printf("(key:%s, value=%s)", key, value);
+    }
+}        
+
+
+static void polkit_subject_dump(GVariant  *variant)
+{
+    const gchar *kind;
+    GVariant *details_gvariant;
+    g_variant_get (variant,
+                 "(&s@a{sv})",
+                 &kind,
+                 &details_gvariant);
+    
+    printf("kind:%s, details_gvariant:", kind);
+    polkit_details_dump(details_gvariant);
+    printf("\n");
+}
+
+
+
+
+
+
