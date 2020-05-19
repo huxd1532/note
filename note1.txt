@@ -1,0 +1,30 @@
+1、调试x服务
+export  DPSIPALY=:0
+xdotool  key XF86LogGrabInfo
+
+xdotool keydown "shift+Print"; xdotool key "XF86LogGrabInfo"; xdotool keyup "Print"; sleep 1; xdotool keyup "shift"; tail /var/log/Xorg.0.log 
+
+2、调试dde-session-daemon
+killall dde-session-daemon;env DDE_DEBUG_MATCH="power" ./out/bin/dde-session-daemon
+
+3、deb包相关
+查看一个包信息信息：dpkg -s plymouth 或者aptitude show plymouth
+查看源中是否有某个包：apt-cache  search  plymouth
+查看一个包在仓库中的位置：apt-cache policy   plymouth
+
+4、 gsettings 相关的内容
+https://docsin.deepin.com/?s=gsettings
+
+5、GOPATH
+/usr/share/gocode
+
+6、系统组文档
+https://docs.deepin.cn/d/f66238188c/
+
+7、设置待机时间
+gsettings  range  com.deepin.dde.power battery-screen-black-delay
+gsettings  set  com.deepin.dde.power battery-screen-black-delay 60 (单位：秒)
+gsettings  set  com.deepin.dde.power battery-sleep-delay 30 
+
+
+
