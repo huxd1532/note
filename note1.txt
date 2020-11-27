@@ -24,7 +24,9 @@ https://docs.deepin.cn/d/f66238188c/
 7、设置待机时间
 gsettings  range  com.deepin.dde.power battery-screen-black-delay
 gsettings  set  com.deepin.dde.power battery-screen-black-delay 60 (单位：秒)
-gsettings  set  com.deepin.dde.power battery-sleep-delay 30 
+gsettings  set  com.deepin.dde.power battery-sleep-delay 30
+
+ 
 
 
 
