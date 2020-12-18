@@ -90,5 +90,4 @@ useradd -D [-b][-e <有效期限>][-f <缓冲天数>][-g <群组>][-G <群组>][
 * Vim移动光标快捷键汇总: http://c.biancheng.net/view/3008.html
 
 
-
 ## 参考资料： http://c.biancheng.net/linux_tutorial/
