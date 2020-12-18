@@ -118,27 +118,8 @@ sudo mount -t overlay overlay -o lowerdir=lower1:lower2,upperdir=upper,workdir=w
 > 例如，向foo1写入，结果如下：
 ![avatar](./example-7.png)
 
-### 5、重命名文件和目录
-* **场景一：关闭redirect dir特性**
-* **场景二：打开redirect dir特性**
-
-### 6、原子性保证（Workdir）
-* **场景一：删除upper层文件/目录并创建whiteout的过程**
-* **场景二：在whiteout上创建同名文件/目录的过程**
-* **场景三：删除上下层合并目录的过程**
-* **场景四：文件/目录copyup的过程**
-
-### 7、Origin扩展属性和Impure扩展属性
-
-### 8、Index特性
-* **Hard link break问题**
-* **Index属性开启后对overlay发生的变化**
-
 
 ## 五、overlayroot（扩展内容）
-
-mount -t  overlay /dev/nvme0n1p3 -o lowerdir=/media/root-ro,upperdir=/media/root-rw//overlay,workdir=/media/root-rw//overlay-workdir overlayroot
-
 
 
 参考资料：https://blog.csdn.net/luckyapple1028/article/details/78075358
