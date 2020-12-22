@@ -11,9 +11,9 @@
 
 ## 二、Overlayfs文件系统基本结构
 
-* ### lowdir
-* ### updir
-* ### mergedir
+* ### lowdir：只读层
+* ### updir：可读写层
+* ### mergedir：合并层
 
 > 如下图所示：
 
@@ -35,10 +35,13 @@
 mount -t overlay overlay -o lowerdir=lower1:lower2:lower3,upperdir=upper,workdir=work merged
 ```
 > 挂载选项支持（-o 参数）
-* lowerdir=xxx：
-* upperdir=xxx：
-* workdir=xxx：
-* merged：
+* lowerdir=xxx：指定用户需要挂载的lower层目录（支持多lower，最大支持500层）；
+* upperdir=xxx：指定用户需要挂载的upper层目录；
+* workdir=xxx：指定文件系统的工作基础目录，挂载后内容会被清空，且在使用过程中其内容用户不可见；
+* redirect_dir=on/off：开启或关闭redirect directory特性，开启后可支持merged目录和纯lower层目录的rename/renameat系统调用
+* index=on/off：开启或关闭index特性，开启后可避免hardlink copyup broken问题。
+
+&nbsp;
 
 > 案例演示：
 ```
@@ -64,7 +67,7 @@ sudo mount -t overlay overlay -o lowerdir=lower1:lower2,upperdir=upper,workdir=w
 
 ![avatar](./overlayfs-2.png)
 
-
+&nbsp;
 
 ### 2、删除文件和目录
 * **场景一：要删除的文件或目录来自upper层，且lower层中没有同名的文件或目录**
@@ -105,10 +108,16 @@ sudo mount -t overlay overlay -o lowerdir=lower1:lower2,upperdir=upper,workdir=w
 
 ![avatar](./example-5.png)
 
+&nbsp;
+
+
 * **场景三：创建一个在lower层已经存在且在upper层有whiteout文件的同名文件**
 > overlayfs 会在upper层创建一个同名文件替代**Whiteout文件**，例如，先把foo3删掉，upper层原foo3被删除，同时又产生了一个同名的**Whiteout文件**，然后再创建一个foo3文件，upper层**Whiteout文件**又会被新文件替代。
 
 ![avatar](./example-6.png)
+
+&nbsp;
+
 
 * **场景三：创建一个在lower层已经存在且在upper层有whiteout文件的同名目录**
 > 同上。
@@ -118,31 +127,30 @@ sudo mount -t overlay overlay -o lowerdir=lower1:lower2,upperdir=upper,workdir=w
 > 例如，向foo1写入，结果如下：
 ![avatar](./example-7.png)
 
-### 5、重命名文件和目录
-* **场景一：关闭redirect dir特性**
-* **场景二：打开redirect dir特性**
-
-### 6、原子性保证（Workdir）
-* **场景一：删除upper层文件/目录并创建whiteout的过程**
-* **场景二：在whiteout上创建同名文件/目录的过程**
-* **场景三：删除上下层合并目录的过程**
-* **场景四：文件/目录copyup的过程**
-
-### 7、Origin扩展属性和Impure扩展属性
-
-### 8、Index特性
-* **Hard link break问题**
-* **Index属性开启后对overlay发生的变化**
-
+&nbsp;
 
 ## 五、overlayroot（扩展内容）
+> overlayroot是overlayfs一种特殊用法，它是把整个根文件系统目录做为lower层进行挂载。显卡驱动管理就使用这种overlayfs文件系统进行挂载，主要目的是为了解决显卡驱动方案在切换过程中，一旦发生异常就系统就无法启动问题。
 
+* 挂载方法：
+```
 mount -t  overlay /dev/nvme0n1p3 -o lowerdir=/media/root-ro,upperdir=/media/root-rw//overlay,workdir=/media/root-rw//overlay-workdir overlayroot
+```
+&nbsp;
+
+> overlayroot 提供了三个重要工具：
+* overlayroot-enable: 启动ovlayroot。这里并没没有真正实现overfs文件系统挂载，只是配置了一下/etc/overlayroot.conf，在下次重启时，在initrd阶段挂载完跟文件系统之后，会去读/etc/overlayroot.conf配置，当发现overlayroot为enable状态，就会把根文件系统重新挂载为overlayfs。详细挂载过程请查看：/usr/share/initramfs-tools/scripts/init-bottom/overlayroot脚本。
+
+* overlayroot-disable：和overlayroot-enable过程刚好相反，把/etc/overlayroot.conf对应的配置删除。系统重启后就不再把跟文件系统挂载为overlayfs。
+
+* overlayroot-chroot：把lower层目录强行挂载为可读可写权限，然后再chroot执行任务，任务执行完成后，在把lower层目挂载回之都权限。这个操作主要为用户提供在overlayroot环境下，修改原来的系统的功能。
 
 
+## 六、参考资料
 
-参考资料：https://blog.csdn.net/luckyapple1028/article/details/78075358
+参考链接：https://blog.csdn.net/luckyapple1028/article/details/78075358
 
+参考代码包：overlayroot
 
 
  
