@@ -61,3 +61,29 @@ OpenGL vendor string: NVIDIA Corporation
 https://gitee.com/deepinwiki/wiki/blob/master/linux%E9%A9%B1%E5%8A%A8%E7%AE%A1%E7%90%86.md
 
 https://gitee.com/deepinwiki/wiki/
+
+## 三、NVIDIA Optimus 之 prime-offload 
+* 增加配置文件“70-nvidia.conf”,内容如下：
+```
+Section "ServerLayout"
+  Identifier "layout"
+  Screen 0 "iGPU"
+  Option "AllowNVIDIAGPUScreens"
+EndSection
+
+Section "Device"
+  Identifier "iGPU"
+  Driver "modesetting"
+EndSection
+
+Section "Screen"
+  Identifier "iGPU"
+  Device "iGPU"
+EndSection
+
+Section "Device"
+  Identifier "dGPU"
+  Driver "nvidia"
+EndSection
+
+```
