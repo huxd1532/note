@@ -87,3 +87,23 @@ Section "Device"
 EndSection
 
 ```
+
+## 四、NVIDIA Optimus 之 使用bemblebee
+### １、安装
+```sudo apt-get install bumblebee-nvidia primus primus-libs libgl1-nvidia-glx nvidia-settings```
+
+## 2、测试
+
+### 1) ```optirun glxinfo |grep NVIDIA```
+```
+结果：
+optirun glxinfo |grep NVIDIA
+server glx vendor string: NVIDIA Corporation
+OpenGL vendor string: NVIDIA Corporation
+OpenGL core profile version string: 4.6.0 NVIDIA 418.152.00
+OpenGL core profile shading language version string: 4.60 NVIDIA
+OpenGL version string: 4.6.0 NVIDIA 418.152.00
+OpenGL shading language version string: 4.60 NVIDIA
+```
+### 2) ```optirun glxgears -info```
+

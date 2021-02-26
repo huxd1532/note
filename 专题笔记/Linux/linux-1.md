@@ -1,3 +1,6 @@
+## 参考文献
+* http://c.biancheng.net/linux_tutorial/
+
 ## 1、ACL权限
 * ### 查看ACL权限
 ``` 
