@@ -1,0 +1,11 @@
+Package: deepin-pp
+Source: deepin-pp
+Version: 1.0.2-6
+Architecture: all
+Section: utils
+Maintainer: Deepin 
+Installed-Size: 128310
+Depends:libc6,zenity 
+Priority: optional
+Homepage: https://www.deepin.com/
+Description: poweroff protection

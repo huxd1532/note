@@ -61,3 +61,5 @@ xrandr --output eDP1 --pos 0x0 --mode 1920x1080 --primary --output VGA1 --off
 * 注：如果需要永久保存配置，可以通过更改/etc/X11/xorg.conf或者/etc/X11/xorg.conf.d/xxx 进行保存
 
 
+## 5、AMD显卡从Radeon驱动更换到AMD驱动
+https://wikidev.uniontech.com/index.php?title=%E6%98%BE%E5%8D%A1%E9%A9%B1%E5%8A%A8

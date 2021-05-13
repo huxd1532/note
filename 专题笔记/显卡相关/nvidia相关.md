@@ -106,4 +106,3 @@ OpenGL version string: 4.6.0 NVIDIA 418.152.00
 OpenGL shading language version string: 4.60 NVIDIA
 ```
 ### 2) ```optirun glxgears -info```
-
