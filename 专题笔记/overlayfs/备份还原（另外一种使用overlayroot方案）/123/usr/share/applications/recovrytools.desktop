@@ -1,0 +1,20 @@
+[Desktop Entry]
+X-Deepin-Vendor=deepin
+Name=recoverytool
+Name[zh_CN]=还原控制工具
+Name[zh_HK]=还原控制工具
+Name[zh_TW]=还原控制工具
+GenericName=recoverytool
+GenericName[zh_CN]=还原控制工具
+GenericName[zh_HK]=还原控制工具
+GenericName[zh_TW]=还原控制工具
+Comment[zh_CN]=开启关闭还原功能
+Comment[zh_HK]=开启关闭还原功能
+Comment[zh_TW]=开启关闭还原功能
+Exec=sh -c "pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY /usr/bin/recovrytools"
+Icon=gparted
+Terminal=false
+Type=Application
+Keywords[zh_CN]=还原;
+Keywords[zh_TW]=还原;
+StartupNotify=false
