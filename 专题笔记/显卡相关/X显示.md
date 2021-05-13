@@ -1,3 +1,8 @@
+## 参考资料：
+* linux图形子系统：http://www.wowotech.net/graphic_subsystem/graphic_subsystem_overview.html
+* X11协议还要：https://blog.csdn.net/michael2012zhao/article/details/3961261
+
+
 ## 一、xrandr
 ### 1、设置屏幕的亮度
 * 查看显示设备: ```xrandr | grep -v disconnected | grep connected```
@@ -61,3 +66,5 @@ xrandr --output eDP1 --pos 0x0 --mode 1920x1080 --primary --output VGA1 --off
 * 注：如果需要永久保存配置，可以通过更改/etc/X11/xorg.conf或者/etc/X11/xorg.conf.d/xxx 进行保存
 
 
+## 5、AMD显卡从Radeon驱动更换到AMD驱动
+https://wikidev.uniontech.com/index.php?title=%E6%98%BE%E5%8D%A1%E9%A9%B1%E5%8A%A8

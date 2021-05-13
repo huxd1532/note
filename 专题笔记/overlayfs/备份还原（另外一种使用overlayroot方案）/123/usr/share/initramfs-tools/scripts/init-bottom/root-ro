@@ -1,0 +1,176 @@
+#!/bin/sh
+PREREQ=""
+prereqs(){
+    echo "${PREREQ}"
+}
+
+case "$1" in 
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+MYTAG="root-ro"
+DISABLE_MAGIC_FILE="/disable-root-ro"
+OVERLAY_CONF_FILE="/etc/overlay-root.conf"
+
+ROOT_RO_DRIVER=
+ENABLE_ROOT_RO=
+
+for CMD_PARAM in $(cat /proc/cmdline);do
+    case ${CMD_PARAM} in
+        enable-root-ro)
+            ENABLE_ROOT_RO=yes
+            ;;
+        root-ro-driver=*)
+            ROOT_RO_DRIVER=${CMD_PARAM#root-ro-driver=}
+            ;;
+        skip-overlay-directory=*)
+            SKIP_OVERLAY_DIRECTORY=${CMD_PARAM#skip-overlay-directory=}
+            ;;
+    esac
+done
+
+# check if read-only root fs is disabled
+if [ x"${ENABLE_ROOT_RO}" != "xyes" ];then
+    log_warning_msg "{MYTAG}: disabled, cannot found boot parameter enable-root-ro"
+    exit 0
+fi
+
+if [ -e "${rootmnt}${DISABLE_MAGIC_FILE}" ];then
+    log_warning_msg "{MYTAG}: disabled, found file ${rootmnt}${DISABLE_MAGIC_FILE}"
+    exit 0
+fi
+
+# check if ${ROOT_RO_DRIVER} is defined
+if [ -z "${ROOT_RO_DRIVER}" ];then
+    ROOT_RO_DRIVER=overlay
+fi
+
+
+ROOT_RW=/mnt/root-rw
+ROOT_RO=/mnt/root-ro
+
+case ${ROOT_RO_DRIVER} in
+    overlay)
+        MOUNT_PARMS="-t overlay -o lowerdir=${ROOT_RO},upperdir=${ROOT_RW}/rw,workdir=${ROOT_RW}/work  overlay-root ${rootmnt}"
+        ;;
+    aufs)
+        MOUNT_PARMS="-t aufs -o dirs=${ROOT_RW}:${ROOT_RO}=ro aufs-root ${rootmnt}"
+        ;;
+    *)
+        panic "${MYTAG} ERROR: invalide ROOT_RO_DRIVER ${ROOT_RO_DRIVER}"
+        ;;
+esac
+
+[ -d ${ROOT_RW} ] || mkdir -p ${ROOT_RW} 
+[ -d ${ROOT_RO} ] || mkdir -p ${ROOT_RO} 
+
+mount -t tmpfs tmpfs-root ${ROOT_RW}
+if [ $? -ne 0 ];then
+    log_failure_msg "{MYTAG} ERROR: failed to create tmpfs"
+fi
+case ${ROOT_RO_DRIVER} in
+    overlay)
+        mkdir -p ${ROOT_RW}/rw
+        mkdir -p ${ROOT_RW}/work
+        ;;
+esac
+
+
+mount --move ${rootmnt} ${ROOT_RO}
+if [ $? -ne 0 ];then
+    log_failure_msg "${MYTAG} ERROR: failed to move root away from ${rootmnt} to ${ROOT_RO}"
+fi
+
+mount ${MOUNT_PARMS}
+if [ $? -ne 0 ];then
+    log_failure_msg "${MYTAG} ERROR: failed to create new ro/rw layerd ${rootmnt}"
+    mount --move ${ROOT_RO} ${rootmnt}
+    if [ $? -ne 0 ]; then
+        panic "${MYTAG} RECOVERY ERROR: failed to move ${ROOT_RO} back to ${rootmnt}"
+    fi
+    exit 0
+fi
+
+[ -d ${rootmnt}${ROOT_RO} ] || mkdir -p ${rootmnt}${ROOT_RO}
+mount --move ${ROOT_RO} ${rootmnt}${ROOT_RO}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR: failed to move ${ROOT_RO} to ${rootmnt}${ROOT_RO}"
+    exit 0
+fi
+
+[ -d ${rootmnt}${ROOT_RW} ] || mkdir -p ${rootmnt}${ROOT_RW}
+mount --move ${ROOT_RW} ${rootmnt}${ROOT_RW}
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG}: ERROR: failed to move ${ROOT_RW} to ${rootmnt}${ROOT_RW}"
+    exit 0
+fi
+
+ROOT_TYPE=$(cat /proc/mounts | grep ${ROOT} | cut -d' ' -f3)
+ROOT_OPTIONS=$(cat /proc/mounts | grep ${ROOT} | cut -d' ' -f4)
+cat <<EOF >${rootmnt}/etc/fstab
+#
+#  This fstab is in RAM, the real one can be found at ${ROOT_RO}/etc/fstab
+#  The original entry for '/' and all swap files have been removed.  The new
+#  entry for the read-only the real root fs follows. Write access can be
+#  enabled using:
+#    sudo mount -o remount,rw ${ROOT_RO}
+#  re-mounting it read-only is done using:
+#    sudo mount -o remount,ro ${ROOT_RO}
+#
+# ${ROOT} ${ROOT_RO} ${ROOT_TYPE} ${ROOT_OPTIONS} 0 0
+#
+#  remaining entries from the original ${ROOT_RO}/etc/fstab follow.
+#
+EOF
+
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR: failed to modify /etc/fstab (step 1)"
+    #exit 0
+fi
+
+#remove root entry and swap/proc from fstab
+cat ${rootmnt}${ROOT_RO}/etc/fstab | grep -v '\s/\s' | grep -v proc | grep -v swap >>${rootmnt}/etc/fstab
+if [ $? -ne 0 ]; then
+    log_failure_msg "${MYTAG} ERROR: failed to modify etc/fstab (step 2)"
+    #exit 0
+fi
+
+# bind mount to skip overlay 
+for path in $(cat /etc/fstab| grep -v '^#' | grep -v '^$' | grep '^/' | awk '{print $2}');do
+    if [ x"${path}" != "x/" ];then
+        mount --bind ${rootmnt}${ROOT_RO}${path} ${rootmnt}${path}
+            if [ $? -ne 0 ];then
+                log_failure_msg "${MYTAG} ERROR: failed to bind mountpoint ${path} to skip overlay"
+            fi
+    fi
+done
+
+# Try to load overlay-root config file when not set SKIP_OVERLAY_DIRECTORY
+if [ -z "${SKIP_OVERLAY_DIRECTORY}" ];then
+	if [ -e "${rootmnt}${OVERLAY_CONF_FILE}" ];then
+		SKIP_OVERLAY_DIRECTORY=$(cat ${rootmnt}${OVERLAY_CONF_FILE} | grep "^skip-overlay-directory=")
+		SKIP_OVERLAY_DIRECTORY=${SKIP_OVERLAY_DIRECTORY#skip-overlay-directory=}
+	fi
+fi
+
+if [ ! -z "${SKIP_OVERLAY_DIRECTORY}" ];then
+    SKIP_OVERLAY_DIRECTORY="$(echo ${SKIP_OVERLAY_DIRECTORY} | tr "," " ")"
+    for path in ${SKIP_OVERLAY_DIRECTORY};do
+        if [ -d ${rootmnt}${ROOT_RO}${path} ];then
+            mount --bind ${rootmnt}${ROOT_RO}${path} ${rootmnt}${path}
+            mount -o remount,rw ${rootmnt}${path}
+            if [ $? -ne 0 ];then
+                log_failure_msg "${MYTAG} ERROR: failed to bind mount directory ${path} to skip overlay"
+            fi
+        fi
+    done
+fi
+
+log_success_msg "${MYTAG} sucessfully set up ro/tmpfs-rw layered root fs using ${ROOT_RO_DRIVER}"
+
+exit 0

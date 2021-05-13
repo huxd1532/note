@@ -1,0 +1,32 @@
+#!/bin/bash
+zenity --question --title=还原控制工具 --text="是否开启还原功能" --no-wrap --ok-label '开启' --cancel-label '关闭' --width='260' --height='120' --timeout='100'
+if [ $? = 0 ]
+then
+    #yes
+    if cat /etc/default/grub | grep enable-root-ro >/dev/null
+    then
+	    echo "enable-root-ro"
+    else
+      sed -i s/video=VGA-1:1280x1024@60/video=VGA-1:1280x1024@60\ enable-root-ro/g /etc/default/grub
+      #update-grub
+    fi
+
+    if cat /boot/grub/grub.cfg | grep enable-root-ro >/dev/null
+    then
+	    echo "enable-root-ro"
+    else
+      sed -i s/video=VGA-1:1280x1024@60/video=VGA-1:1280x1024@60\ enable-root-ro/g /boot/grub/grub.cfg
+      #sed -i s/\ ro\ /\ ro\ enable-root-ro\ /g /boot/grub/grub.cfg
+    fi
+else
+    #no
+    if cat /etc/default/grub | grep enable-root-ro >/dev/null
+    then
+      sed -i s/video=VGA-1:1280x1024@60\ enable-root-ro/video=VGA-1:1280x1024@60/g /etc/default/grub
+    fi
+    if cat /boot/grub/grub.cfg | grep enable-root-ro >/dev/null
+    then
+      sed -i s/video=VGA-1:1280x1024@60\ enable-root-ro/video=VGA-1:1280x1024@60/g /boot/grub/grub.cfg
+      #sed -i s/\ ro\ enable-root-ro\ /\ ro\ /g /boot/grub/grub.cfg
+    fi
+fi
