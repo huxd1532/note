@@ -87,6 +87,7 @@ Section "Device"
 EndSection
 
 ```
+* 参考file:///home/uos/code/nvidia-driver/nvidia-graphics-drivers-460.91.03/nvidia-graphics-drivers-460.91.03/NVIDIA-Linux-x86_64-460.91.03/html/randr14.html
 
 ## 四、NVIDIA Optimus 之 使用bemblebee
 ### １、安装

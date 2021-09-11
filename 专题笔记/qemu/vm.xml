@@ -1,0 +1,63 @@
+<domain type='kvm'>
+  <name>vm20</name>
+  <memory unit='G'>4</memory>
+  <currentMemory unit='G'>2</currentMemory>
+
+
+  <os>
+    <type arch='x86_64'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+  </features>
+  <clock offset='localtime'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/home/uos/Desktop/VM/centos7-kde-desktop.qcow2'/>
+      <target dev='hda' bus='ide'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
+    </disk>
+<!--
+
+    <interface type='direct'>
+      <mac address='1a:2b:3c:4d:5e:6a'/>
+      <source dev='eno1' mode='bridge' />
+      <model type='e1000'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
+-->
+    <interface type='network'>
+      <mac address='52:54:00:e8:7d:af'/>
+      <source network='default' bridge='virbr0'/>
+      <target dev='vnet0'/>
+      <model type='e1000'/>
+      <alias name='net0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+    </interface>
+
+
+<!--
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+-->    
+    <graphics type='vnc' port='-1' autoport='yes' listen = '0.0.0.0' keymap='en-us'/>   
+    <serial type="tcp">
+        <source mode="bind" host="0.0.0.0" service="4003"/>
+        <protocol type="telnet"/>
+        <target port="1"/>
+    </serial>
+  </devices>
+</domain>
