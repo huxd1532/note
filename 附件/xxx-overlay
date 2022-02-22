@@ -1,0 +1,24 @@
+#!/bin/sh
+
+case "$1" in
+        # no pre-reqs
+        prereqs) echo ""; exit 0;;
+esac
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+MYTAG="Deepin"
+
+ROOTMNT=${rootmnt}
+DATA_DEV="/dev/sda5"
+
+
+OVERLAY_DEVICE=$(cat /proc/mounts |grep ${ROOTMNT}/media/root-rw |awk '{print $1}')
+
+if [ "${OVERLAY_DEVICE}" = "${LOOP_DEV}" ]; then
+    mount ${DATA_DEV} ${ROOTMNT}/data
+    [ -d ${ROOTMNT}/data/overlay-var/upper ] || mkdir -p ${ROOTMNT}/data/overlay-var/upper
+    [ -d ${ROOTMNT}/data/overlay-var/lower ] || mkdir -p ${ROOTMNT}/data/overlay-var/lower
+    [ -d ${ROOTMNT}/data/overlay-var/worker ] || mkdir -p ${ROOTMNT}/data/overlay-var/worker
+    mount --bind ${ROOTMNT}/data/var  ${ROOTMNT}/data/overlay-var/lower
+    mount -t overlay overlay -o lowerdir=${ROOTMNT}/data/overlay-var/lower,upperdir=${ROOTMNT}/data/overlay-var/upper,workdir=${ROOTMNT}/data/overlay-var/worker ${ROOTMNT}/data/var
+fi

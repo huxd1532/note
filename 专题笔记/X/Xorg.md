@@ -21,3 +21,9 @@ X windows 研究笔记：　https://www.doc88.com/p-4774133868874.html?r=1
 * x toolkit实现很多常用的组件，比如说GTK+，QT就是很流行的x toolkit。
 * 所以平时开发应用的时候，只需要使用QT等就可以了，无需理会x server等存在。
 
+
+## 二、参考资料
+* glx详解：　https://tronche.com/gui/x/xlib/
+* gpu技术趋势：https://blog.csdn.net/pizi0475/article/details/5457296
+
+

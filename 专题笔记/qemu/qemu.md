@@ -2,7 +2,7 @@
 * debian 下载： http://cdimage.debian.org/cdimage/archive/
 
 ## 二、环境搭建
-* ```sudo apt-get  install  -y libvirt0 libvirt-daemon qemu virt-manager bridge-utils libvirt-clients python-libvirt  qemu-efi uml-utilities  virtinst ```
+* ```sudo apt-get  install  -y libvirt0 libvirt-daemon qemu virt-manager bridge-utils libvirt-clients python-libvirt  qemu-efi uml-utilities  virtinst  qemu-system-x86```
 
 
 ## 三、创建虚拟机
